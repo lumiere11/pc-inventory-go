@@ -17,7 +17,7 @@ func main() {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&models.Product{}, &models.Category{})
+	db.AutoMigrate(&models.Product{}, &models.Category{}, &models.Status{})
 	categories := []models.Category{
 		{Name: "Perifericos"},
 		{Name: "Monitores"},
@@ -26,6 +26,12 @@ func main() {
 	ctx := context.Background()
 
 	err = gorm.G[[]models.Category](db).Create(ctx, &categories) // pass pointer of data to Create
+	statuses := []models.Status{
+		{Name: "stock"},
+		{Name: "sold out"},
+	}
+
+	err = gorm.G[[]models.Status](db).Create(ctx, &statuses) // pass pointer of data to Create
 
 	productHandler := handlers.NewProductHandler(db)
 

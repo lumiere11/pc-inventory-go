@@ -22,10 +22,15 @@ func (h *ProductHandler) GetByProperty(c *gin.Context) {
 	var products []models.Product
 	ctx := context.Background()
 	q := c.Query("q")
-
+	status := c.Query("status")
+	if status == "" {
+		status = "stock"
+	}
 	if err := h.DB.WithContext(ctx).
 		Joins("JOIN categories ON categories.id = products.category_id").
+		Joins("JOIN statuses ON statuses.id = products.status_id").
 		Where("(products.name LIKE ? OR products.brand LIKE ? OR categories.name LIKE ?)", "%"+q+"%", "%"+q+"%", "%"+q+"%").
+		Where("statuses.name = ?", status).
 		Preload("Category").
 		Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -58,6 +63,16 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	if err != nil {
 		c.JSON(404, gin.H{"error": "Product not found"})
 		return
+	}
+	if err := h.DB.Preload("Category").First(&product, product.ID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Product not found"})
+		return
+
+	}
+	if err := h.DB.Preload("Status").First(&product, product.ID).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Product not found"})
+		return
+
 	}
 	c.JSON(200, gin.H{
 		"status": "success",

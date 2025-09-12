@@ -1,19 +1,8 @@
 package models
 
-type Status int
+import "gorm.io/gorm"
 
-const (
-	Inactive Status = iota
-	Active
-)
-
-func (s Status) String() string {
-	switch s {
-	case Inactive:
-		return "Inactive"
-	case Active:
-		return "Active"
-	default:
-		return "Unknown"
-	}
+type Status struct {
+	gorm.Model
+	Name string `gorm:"not null;unique;size:100" json:"name"`
 }

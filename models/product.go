@@ -10,7 +10,8 @@ type Product struct {
 	Description string   `gorm:"not null;size:255" json:"description"`
 	Stock       int32    `json:"stock"`
 	Price       float32  `json:"price"`
-	Status      string   `json:"status"`
+	StatusID    uint     `json:"status_id"`
+	Status      Status   `gorm:"foreignKey:StatusID" json:"status"`
 	CategoryID  uint     `gorm:"not null" json:"category_id"`
 	Category    Category `gorm:"foreignKey:CategoryID" json:"category"`
 }
