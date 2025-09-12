@@ -34,6 +34,7 @@ func main() {
 	api := router.Group("/api/v1")
 	{
 		api.POST("/products", productHandler.CreateProduct)
+		api.GET("/products/search", productHandler.GetByProperty)
 	}
 	router.Run() // listen and serve on 0.0.0.0:8080
 

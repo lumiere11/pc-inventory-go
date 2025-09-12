@@ -18,6 +18,22 @@ func NewProductHandler(db *gorm.DB) *ProductHandler {
 		DB: db,
 	}
 }
+func (h *ProductHandler) GetByProperty(c *gin.Context) {
+	var products []models.Product
+	ctx := context.Background()
+	q := c.Query("q")
+
+	if err := h.DB.WithContext(ctx).
+		Joins("JOIN categories ON categories.id = products.category_id").
+		Where("(products.name LIKE ? OR products.brand LIKE ? OR categories.name LIKE ?)", "%"+q+"%", "%"+q+"%", "%"+q+"%").
+		Preload("Category").
+		Find(&products).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, products)
+}
 func (h *ProductHandler) CreateProduct(c *gin.Context) {
 	var product models.Product
 	ctx := context.Background()
