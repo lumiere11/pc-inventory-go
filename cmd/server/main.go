@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lumiere11/pc-inventory-go/handlers"
+	"github.com/lumiere11/pc-inventory-go/middlewares"
 	"github.com/lumiere11/pc-inventory-go/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,7 +18,7 @@ func main() {
 	}
 
 	// Migrate the schema
-	db.AutoMigrate(&models.Product{}, &models.Category{}, &models.Status{})
+	db.AutoMigrate(&models.Product{}, &models.Category{}, &models.Status{}, &models.User{})
 	categories := []models.Category{
 		{Name: "Perifericos"},
 		{Name: "Monitores"},
@@ -34,10 +35,13 @@ func main() {
 	err = gorm.G[[]models.Status](db).Create(ctx, &statuses) // pass pointer of data to Create
 
 	productHandler := handlers.NewProductHandler(db)
+	authHandler := handlers.NewAuthHandler(db)
 
 	router := gin.Default()
+	router.POST("/register", authHandler.Register)
+	router.POST("/login", authHandler.Login)
 
-	api := router.Group("/api/v1")
+	api := router.Group("/api/v1", middlewares.AuthMiddleware())
 	{
 		api.POST("/products", productHandler.CreateProduct)
 		api.GET("/products/search", productHandler.GetByProperty)
