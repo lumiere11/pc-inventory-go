@@ -38,13 +38,16 @@ func main() {
 	authHandler := handlers.NewAuthHandler(db)
 
 	router := gin.Default()
-	router.POST("/register", authHandler.Register)
-	router.POST("/login", authHandler.Login)
 
 	api := router.Group("/api/v1", middlewares.AuthMiddleware())
 	{
 		api.POST("/products", productHandler.CreateProduct)
 		api.GET("/products/search", productHandler.GetByProperty)
+	}
+	apii := router.Group("/api/v1")
+	{
+		apii.POST("/register", authHandler.Register)
+		apii.POST("/login", authHandler.Login)
 	}
 	router.Run() // listen and serve on 0.0.0.0:8080
 
