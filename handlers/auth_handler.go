@@ -8,12 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/lumiere11/pc-inventory-go/models"
+	"github.com/lumiere11/pc-inventory-go/requests"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 type Claims struct {
 	Email string `json:"email"`
+	Role  string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -28,19 +30,28 @@ func NewAuthHandler(db *gorm.DB) *AuthHandler {
 		DB: db,
 	}
 }
+func (h *AuthHandler) verifyPasswords(password, password_confirmation string) bool {
+	return password == password_confirmation
+}
 
 // Registro de usuario
 func (h *AuthHandler) Register(c *gin.Context) {
 	ctx := context.Background()
-	var req models.User
+	var req requests.UserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
-
+	if !h.verifyPasswords(req.Password, req.PasswordConfirmation) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
 	hash, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	req.Password = string(hash)
-	result := h.DB.WithContext(ctx).Create(&req)
+	var user models.User
+	user.Email = req.Email
+	user.Password = string(hash)
+	user.Role = "normal_user"
+	result := h.DB.WithContext(ctx).Create(&user)
 	if result.Error != nil {
 		c.JSON(200, gin.H{
 			"status":  "error",
@@ -83,6 +94,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),
 		},
+		Role: user.Role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

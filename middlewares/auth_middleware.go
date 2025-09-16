@@ -13,6 +13,7 @@ var jwtKey = []byte("secret_key")
 
 type Claims struct {
 	Email string `json:"email"`
+	Role  string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -51,6 +52,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("email", claims.Email)
+		c.Set("role", claims.Role)
 
 		c.Next()
 	}

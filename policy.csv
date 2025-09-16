@@ -1,0 +1,9 @@
+p, admin, /api/v1/products, POST
+p, admin, /api/v1/products, GET
+p, admin, /api/v1/products/search, GET
+p, admin, /api/v1/products/:id, PUT
+p, admin, /api/v1/products/:id, DELETE
+p, admin, /api/v1/products/:id/stock, PUT
+
+p, normal_user, /api/v1/products/search, GET
+p, normal_user, /api/v1/products/:id/stock, PUT
