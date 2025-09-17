@@ -27,7 +27,6 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 	api := router.Group("/api/v1", middlewares.AuthMiddleware(), middlewares.CasbinMiddleware(enforcer))
 	{
 		api.POST("/products", productHandler.CreateProduct)
-		api.GET("/products/search", productHandler.GetByProperty)
 		api.PUT("/products/:id", productHandler.UpdateProduct)
 		api.PUT("/products/:id/stock", productHandler.UpdateStock)
 		api.DELETE("/products/:id", productHandler.Delete)
@@ -38,6 +37,7 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 	{
 		publicAPI.POST("/register", authHandler.Register)
 		publicAPI.POST("/login", authHandler.Login)
+		publicAPI.GET("/products/search", productHandler.GetByProperty) // Public search endpoint
 	}
 
 	return router

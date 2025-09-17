@@ -88,7 +88,7 @@ func SeedData(db *gorm.DB) error {
 		if peripheralsCategory.ID > 0 && stockStatus.ID > 0 {
 			sampleProducts := []models.Product{
 				{
-					Name:        "Razer DeathAdder V3",
+					Name:        "Razer DeathAdder V3 Mouse",
 					Brand:       "Razer",
 					Model2:      "RZ01-04910100-R3U1",
 					Description: "Gaming mouse with ergonomic design",
@@ -108,12 +108,22 @@ func SeedData(db *gorm.DB) error {
 					CategoryID:  peripheralsCategory.ID,
 				},
 				{
-					Name:        "Logitech G502",
+					Name:        "Logitech G502 Mouse",
 					Brand:       "Logitech",
 					Model2:      "910-005550",
 					Description: "High performance gaming mouse",
 					Stock:       12,
 					Price:       79.99,
+					StatusID:    stockStatus.ID,
+					CategoryID:  peripheralsCategory.ID,
+				},
+				{
+					Name:        "Corsair M65 RGB Elite Mouse",
+					Brand:       "Corsair",
+					Model2:      "CH-9309011-NA",
+					Description: "FPS gaming mouse with sniper button",
+					Stock:       10,
+					Price:       59.99,
 					StatusID:    stockStatus.ID,
 					CategoryID:  peripheralsCategory.ID,
 				},
